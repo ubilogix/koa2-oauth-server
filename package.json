@@ -1,0 +1,11 @@
+{
+  "name": "koa-oauth2-server",
+  "version": "0.0.1",
+  "description": "Koa wrapper for node-oauth2-server.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Lars F. Karlström <lars@ubilogix.com>",
+  "license": "MIT"
+}
