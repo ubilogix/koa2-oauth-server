@@ -1,6 +1,7 @@
 'use strict';
 
-const OAuthServer = require('node-oauth2-server'),
+const debug       = require('debug')('koa:oauth2-server'),
+      OAuthServer = require('node-oauth2-server'),
       Request     = OAuthServer.Request,
       Response    = OAuthServer.Response;
 
@@ -21,6 +22,7 @@ class KoaOAuthServer {
 
     // Returns token authentication middleware
     authenticate() {
+        debug('Creating authentication endpoint middleware');
         return (ctx, next) => {
             const request  = new Request(ctx.request),
                   response = new Response(ctx.response);
@@ -38,6 +40,7 @@ class KoaOAuthServer {
     // Returns authorization endpoint middleware
     // Used by the client to obtain authorization from the resource owner
     authorize() {
+        debug('Creating authorization endpoint middleware');
         return (ctx, next) => {
             const request  = new Request(ctx.request),
                   response = new Response(ctx.response);
@@ -56,6 +59,7 @@ class KoaOAuthServer {
     // Returns token endpoint middleware
     // Used by the client to exchange authorization grant for access token
     token() {
+        debug('Creating token endpoint middleware');
         return (ctx, next) => {
             const request  = new Request(ctx.request),
                   response = new Response(ctx.response);
@@ -79,8 +83,9 @@ function handleResponse(ctx, response) {
 }
 
 function handleError(err, ctx, response) {
-    ctx.status = err.code;
+    debug(err);
 
+    ctx.status = err.code;
     if(response) { ctx.set(response.headers); }
     if(err instanceof UnauthorizedRequestError) { return; }
 
