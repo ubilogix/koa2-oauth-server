@@ -39,14 +39,14 @@ class KoaOAuthServer {
 
     // Returns authorization endpoint middleware
     // Used by the client to obtain authorization from the resource owner
-    authorize() {
+    authorize(options) {
         debug('Creating authorization endpoint middleware');
         return (ctx, next) => {
             const request  = new Request(ctx.request),
                   response = new Response(ctx.response);
 
             return this.server
-                .authorize(request, response)
+                .authorize(request, response, options)
                 .then((code) => {
                     ctx.state.oauth = { code: code };
                     handleResponse(ctx, response);
