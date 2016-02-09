@@ -82,14 +82,10 @@ function handleResponse(ctx, response) {
     ctx.body   = response.body;
 }
 
+// Add custom headers to the context, then propagate error upwards
 function handleError(err, ctx, response) {
-    debug(err);
-
-    ctx.status = err.code;
     if(response) { ctx.set(response.headers); }
-    if(err instanceof UnauthorizedRequestError) { return; }
-
-    ctx.body = { error: err.name, error_description: err.message };
+    throw err;
 }
 
 module.exports = KoaOAuthServer;
