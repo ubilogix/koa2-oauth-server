@@ -17,6 +17,12 @@ class KoaOAuthServer {
             throw new InvalidArgumentError('Missing parameter: `model`');
         }
 
+        // If no `saveTokenMetadata` method is set via the model, we create
+        // a simple passthrough mechanism instead
+        this.saveTokenMetadata = options.model.saveTokenMetadata
+            ? options.model.saveTokenMetadata
+            : (token, data) => { return Promise.resolve(token); };
+
         this.server = new OAuthServer(options);
     }
 
@@ -66,6 +72,9 @@ class KoaOAuthServer {
 
             return this.server
                 .token(request, response)
+                .then((token) => {
+                    return this.saveTokenMetadata(token, ctx.request);
+                })
                 .then((token) => {
                     ctx.state.oauth = { token: token };
                     handleResponse(ctx, response);
