@@ -1,11 +1,12 @@
 'use strict';
 
 const debug       = require('debug')('koa:oauth2-server'),
-      OAuthServer = require('node-oauth2-server'),
+      OAuthServer = require('oauth2-server'),
       Request     = OAuthServer.Request,
       Response    = OAuthServer.Response;
 
-const ePath                    = 'node-oauth2-server/lib/errors/',
+const ePath                    = 'oauth2-server/lib/errors/',
+      InvalidScopeError        = require(ePath + 'invalid-scope-error'),
       InvalidArgumentError     = require(ePath + 'invalid-argument-error'),
       UnauthorizedRequestError = require(ePath + 'unauthorized-request-error');
 
@@ -22,6 +23,11 @@ class KoaOAuthServer {
         this.saveTokenMetadata = options.model.saveTokenMetadata
             ? options.model.saveTokenMetadata
             : (token, data) => { return Promise.resolve(token); };
+
+        // If no `checkScope` method is set via the model, we provide a default
+        this.checkScope = options.model.checkScope
+            ? options.model.checkScope
+            : (scope, token) => { return token.scope.indexOf(scope) !== -1; }
 
         this.server = new OAuthServer(options);
     }
@@ -80,7 +86,25 @@ class KoaOAuthServer {
                     handleResponse(ctx, response);
                     return next();
                 })
-                .catch((err) => { handleError(err, ctx, response); });
+                .catch((err) => { handleError(err, ctx); });
+        };
+    }
+
+    // Returns scope check middleware
+    // Used to limit access to a route or router to carriers of a certain scope.
+    scope(required) {
+        return (ctx, next) => {
+            const result = this.checkScope(required, ctx.state.oauth.token);
+            if(result !== true) {
+                const err = result === false
+                    ? `Required scope: \`${required}\``
+                    : result;
+
+                handleError(new InvalidScopeError(err), ctx);
+                return;
+            }
+
+            return next();
         };
     }
 }
@@ -92,9 +116,14 @@ function handleResponse(ctx, response) {
 }
 
 // Add custom headers to the context, then propagate error upwards
-function handleError(err, ctx, response) {
-    if(response) { ctx.set(response.headers); }
+function handleError(err, ctx) {
+    if(ctx.response) { ctx.set(new Response(ctx.response).headers); }
     throw err;
 }
+
+// Expose error classes
+KoaOAuthServer.InvalidScopeError        = InvalidScopeError;
+KoaOAuthServer.InvalidArgumentError     = InvalidArgumentError;
+KoaOAuthServer.UnauthorizedRequestError = UnauthorizedRequestError;
 
 module.exports = KoaOAuthServer;
