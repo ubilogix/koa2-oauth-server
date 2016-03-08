@@ -279,6 +279,7 @@ rPublic.post('/oauth/authorize', (ctx, next) => {
 
     ctx.request.body         = ctx.session.query;
     ctx.request.body.user_id = ctx.session.userId;
+    ctx.session.query        = null;
 
     return next();
 }, oauth.authorize({
