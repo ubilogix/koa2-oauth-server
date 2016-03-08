@@ -5,16 +5,23 @@ Koa 2 OAuth Server
 
 The wrapper is based on [express-oauth-server][eoas].
 
+
 Installation
 ------------
 
 TODO: Installation instructions, when published on npmjs.
 
-Quick Start
------------
 
-TODO: Outline usage here.
+Configuration
+-------------
 
+A complete reference implementation is available in the `/examples` directory.
+The sample implements the following grant flows:
+
+* Password (resource owner password credentials)
+* Authorization code
+* Refresh token
+* Client credentials
 
 
 Additional features
@@ -61,7 +68,6 @@ account.get('/edit', oauth.scope('edit'), (...) => { // Requires `edit` too
 protected.use(account);
 ```
 
-
 ### Token grant metadata access
 
 Exposes the `ctx.request` object to the model, allowing for processing and
@@ -83,9 +89,6 @@ model.saveTokenMetadata = (token, data) => {
     });
 };
 ```
-
-
-
 
 [noa2s]: https://github.com/thomseddon/node-oauth2-server
 [eoas]: https://github.com/seegno/express-oauth-server
