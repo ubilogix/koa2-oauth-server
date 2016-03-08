@@ -1,0 +1,8 @@
+{
+    "validateIndentation": 4,
+    "validateQuoteMarks": "'",
+    "requireCurlyBraces": ["if", "else", "for", "while", "do", "try", "catch"],
+    "requireAlignedMultilineParams": "firstParam",
+    "disallowNewlineBeforeBlockStatements": true,
+    "disallowOperatorBeforeLineBreak": true
+}
