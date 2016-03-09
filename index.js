@@ -36,6 +36,7 @@ class KoaOAuthServer {
     authenticate() {
         debug('Creating authentication endpoint middleware');
         return (ctx, next) => {
+            debug('Running authenticate endpoint middleware');
             const request  = new Request(ctx.request),
                   response = new Response(ctx.response);
 
@@ -54,6 +55,7 @@ class KoaOAuthServer {
     authorize(options) {
         debug('Creating authorization endpoint middleware');
         return (ctx, next) => {
+            debug('Running authorize endpoint middleware');
             const request  = new Request(ctx.request),
                   response = new Response(ctx.response);
 
@@ -73,6 +75,7 @@ class KoaOAuthServer {
     token() {
         debug('Creating token endpoint middleware');
         return (ctx, next) => {
+            debug('Running token endpoint middleware');
             const request  = new Request(ctx.request),
                   response = new Response(ctx.response);
 
@@ -93,6 +96,7 @@ class KoaOAuthServer {
     // Returns scope check middleware
     // Used to limit access to a route or router to carriers of a certain scope.
     scope(required) {
+        debug(`Creating scope check middleware (${required})`);
         return (ctx, next) => {
             const result = this.checkScope(required, ctx.state.oauth.token);
             if(result !== true) {
@@ -110,6 +114,7 @@ class KoaOAuthServer {
 }
 
 function handleResponse(ctx, response) {
+    debug(`Preparing success response (${response.status})`);
     ctx.set(response.headers);
     ctx.status = response.status;
     ctx.body   = response.body;
@@ -117,7 +122,12 @@ function handleResponse(ctx, response) {
 
 // Add custom headers to the context, then propagate error upwards
 function handleError(err, ctx) {
-    if(ctx.response) { ctx.set(new Response(ctx.response).headers); }
+    debug(`Preparing error response (${err.code || 500})`);
+
+    const response = new Response(ctx.response);
+    ctx.set(response.headers);
+
+    ctx.status = err.code || 500;
     throw err;
 }
 
