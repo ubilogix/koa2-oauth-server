@@ -6,6 +6,7 @@ const debug       = require('debug')('koa:oauth2-server'),
       Response    = OAuthServer.Response;
 
 const ePath                    = 'oauth2-server/lib/errors/',
+      OAuthError               = require(ePath + 'oauth-error'),
       InvalidScopeError        = require(ePath + 'invalid-scope-error'),
       InvalidArgumentError     = require(ePath + 'invalid-argument-error'),
       UnauthorizedRequestError = require(ePath + 'unauthorized-request-error');
@@ -132,6 +133,7 @@ function handleError(err, ctx) {
 }
 
 // Expose error classes
+KoaOAuthServer.OAuthError               = OAuthError;
 KoaOAuthServer.InvalidScopeError        = InvalidScopeError;
 KoaOAuthServer.InvalidArgumentError     = InvalidArgumentError;
 KoaOAuthServer.UnauthorizedRequestError = UnauthorizedRequestError;
