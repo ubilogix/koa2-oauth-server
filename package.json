@@ -1,6 +1,6 @@
 {
   "name": "ubx-koa2-oauth2-server",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Koa 2 wrapper for node-oauth2-server.",
   "main": "index.js",
   "publishConfig": {
