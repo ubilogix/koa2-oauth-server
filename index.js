@@ -36,16 +36,16 @@ class KoaOAuthServer {
     // Returns token authentication middleware
     authenticate() {
         debug('Creating authentication endpoint middleware');
-        return (ctx, next) => {
+        return async (ctx, next) => {
             debug('Running authenticate endpoint middleware');
             const request  = new Request(ctx.request),
                   response = new Response(ctx.response);
 
-            return this.server
+            await this.server
                 .authenticate(request, response)
-                .then((token) => {
+                .then(async (token) => {
                     ctx.state.oauth = { token: token };
-                    return next();
+                    await next();
                 })
                 .catch((err) => { handleError(err, ctx); });
         };
@@ -55,17 +55,17 @@ class KoaOAuthServer {
     // Used by the client to obtain authorization from the resource owner
     authorize(options) {
         debug('Creating authorization endpoint middleware');
-        return (ctx, next) => {
+        return async (ctx, next) => {
             debug('Running authorize endpoint middleware');
             const request  = new Request(ctx.request),
                   response = new Response(ctx.response);
 
-            return this.server
+            await this.server
                 .authorize(request, response, options)
-                .then((code) => {
+                .then(async (code) => {
                     ctx.state.oauth = { code: code };
                     handleResponse(ctx, response);
-                    return next();
+                    await next();
                 })
                 .catch((err) => { handleError(err, ctx); });
         };
@@ -75,20 +75,20 @@ class KoaOAuthServer {
     // Used by the client to exchange authorization grant for access token
     token() {
         debug('Creating token endpoint middleware');
-        return (ctx, next) => {
+        return async (ctx, next) => {
             debug('Running token endpoint middleware');
             const request  = new Request(ctx.request),
                   response = new Response(ctx.response);
 
-            return this.server
+            await this.server
                 .token(request, response)
                 .then((token) => {
                     return this.saveTokenMetadata(token, ctx.request);
                 })
-                .then((token) => {
+                .then(async (token) => {
                     ctx.state.oauth = { token: token };
                     handleResponse(ctx, response);
-                    return next();
+                    await next();
                 })
                 .catch((err) => { handleError(err, ctx); });
         };
